@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chained Dropdowns</title>
+</head>
+<body>
+    <select id="country">
+        <option value="" selected>Select Country</option>
+    </select>
+    
+    <select id="state">
+        <option value="" selected>Select State</option>
+    </select>
+    
+    <select id="city">
+        <option value="" selected>Select City</option>
+    </select>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $("#country").change(function() {
+            var country = $(this).val();
+            $("#state").load(`/get_states/?country=${country}`);
+        });
+    
+        $("#state").change(function() {
+            var state = $(this).val();
+            $("#city").load(`/get_cities/?state=${state}`);
+        });
+    
+        // Initial load of countries
+        $.get("/get_countries/", function(data) {
+            data.forEach(function(country) {
+                $("#country").append(new Option(country.name, country.name));
+            });
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+
+<form method="post">
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <h1>Welcome, {{ user.first_name }}!</h1>
+        <p>Username: {{ user.username }}</p>
+        <p>First Name: {{ user.first_name }}</p>
+        <p>Last Name: {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+    
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <p>Billing Address</p>
+           <input type="text" placeholder="Billing Address">
+    </div>
+   
+    <div class="col-md-12 col-sm-12 col-lg-12">
+        <p>Phone number</p>
+        <input type="tel" placeholder="Phone Number">
+    </div>
+    {% csrf_token %}
+    <select id="country" name="country">
+        <option value="" selected disabled>Select Country</option>
+        {% for country in countries %}
+            <option value="{{ country.pk }}">{{ country.name }}</option>
+        {% endfor %}
+    </select>
+    
+    <select id="state" name="state">
+        <option value="" selected disabled>Select State</option>
+    </select>
+    
+    <select id="city" name="city">
+        <option value="" selected disabled>Select City</option>
+    </select>
+    
+    <button type="submit">Submit</button>
+</form>
+
+<script>
+    const stateDropdown = document.getElementById('state');
+    const cityDropdown = document.getElementById('city');
+
+    document.getElementById('country').addEventListener('change', function() {
+        const countryId = this.value;
+
+        // Fetch states based on selected country
+        fetch(`/api/get_states/?country_id=${countryId}`)
+            .then(response => response.json())
+            .then(data => {
+                stateDropdown.innerHTML = '<option value="" selected disabled>Select State</option>';
+                data.forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state.id;
+                    option.textContent = state.name;
+                    stateDropdown.appendChild(option);
+                });
+            });
+    });
+
+    stateDropdown.addEventListener('change', function() {
+        const stateId = this.value;
+
+        // Fetch cities based on selected state
+        fetch(`/api/get_cities/?state_id=${stateId}`)
+            .then(response => response.json())
+            .then(data => {
+                cityDropdown.innerHTML = '<option value="" selected disabled>Select City</option>';
+                data.forEach(city => {
+                    const option = document.createElement('option');
+                    option.value = city.id;
+                    option.textContent = city.name;
+                    cityDropdown.appendChild(option);
+                });
+            });
+    });
+</script>
+
